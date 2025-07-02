@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+
+        h1 {
+            color: #0069a9;
+            margin-bottom: 0;
+        }
+
+        .header, .footer {
+            text-align: center;
+            color: #777;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+        }
+
+        .right {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Contrato de Seguro</h1>
+    <p th:text="'ID Contrato: ' + ${contract.id}"></p>
+    <p th:text="'Fecha Inicio: ' + ${contract.startDate}"></p>
+</div>
+
+<div class="section">
+    <h2>Datos del Cliente</h2>
+    <p><strong th:text="'Nombre: '"></strong><span th:text="${client.name + ' ' + client.lastName}"></span></p>
+    <p><strong>Cédula: </strong><span th:text="${client.identificationNumber}"></span></p>
+    <p><strong>Fecha Nac.: </strong><span th:text="${client.birthDate}"></span></p>
+    <p><strong>Teléfono: </strong><span th:text="${client.phoneNumber}"></span></p>
+    <p><strong>Dirección: </strong><span th:text="${client.address}"></span></p>
+    <p><strong>Ocupación: </strong><span th:text="${client.occupation}"></span></p>
+</div>
+
+<div class="section" th:if="${conditions != null and !conditions.isEmpty()}">
+    <h2>Condiciones Especiales</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Condición</th>
+            <th>% Adicional</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cond : ${conditions}">
+            <td th:text="${cond.name}"></td>
+            <td th:text="${cond.addedPercentage + '%'}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Beneficiarios</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Cédula</th>
+            <th>Nombres</th>
+            <th>Parentesco</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="b : ${beneficiaries}">
+            <td th:text="${b.identificationNumber}"></td>
+            <td th:text="${b.name + ' ' + b.lastName}"></td>
+            <td th:text="${b.relationship}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h2>Detalle del Seguro</h2>
+    <p th:text="'Nombre Seguro: ' + ${insurance.name}"></p>
+    <p th:text="'Tipo: ' + ${insurance.type.getLabel()}"></p>
+    <p th:text="'Cobertura: ' + ${insurance.coverage}"></p>
+    <p th:text="'Deducible: ' + ${insurance.deductible}"></p>
+    <p th:text="'Pago ' + ${insurance.paymentPeriod.getLabel()} + ': ' + ${insurance.paymentAmount}"></p>
+
+    <h3>Beneficios Incluidos</h3>
+    <ul>
+        <li th:each="bf : ${insurance.benefits}"
+            th:text="${bf.name} + ' – ' + ${bf.description}"></li>
+    </ul>
+</div>
+
+<div class="section">
+    <h2>Resumen Financiero</h2>
+    <table>
+        <tbody>
+        <tr>
+            <td>Pago Base</td>
+            <td class="right" th:text="${insurance.paymentAmount}"></td>
+        </tr>
+        <tr>
+            <td>Suma % Condiciones</td>
+            <td class="right" th:text="${percentSum} + '%'"></td>
+        </tr>
+        <tr>
+            <td>Pago Ajustado</td>
+            <td class="right" th:text="${adjustedPayment}"></td>
+        </tr>
+        <tr>
+            <td>Frecuencia de Pago</td>
+            <td class="right" th:text="${paymentFrequency}"></td>
+        </tr>
+        <tr>
+            <th>Total Contrato</th>
+            <th class="right" th:text="${totalPayment}"></th>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

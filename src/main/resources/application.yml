@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/insurance-manager
+    username: postgres
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    enabled: true
+    drop-first: false
+    change-log: classpath:db.changelog.xml
+    default-schema: public
+
+server:
+  error:
+    include-message: always
+
+mailgun:
+  api-key: 52bb26272d5109598ec866314c675311-f3238714-b35e6523
+  domain: sandbox4968b3d730234ad0851b18fdd744e0b6.mailgun.org
+
+info:
+  app:
+    name: Fram Seguros API
+    description: API para la gestión de seguros, clientes y contratos.
+    version: 1.0.0
+
+attachment:
+  allowed-types:
+    - PNG
+    - JPG
+    - JPEG
+    - PDF
+  max-file-size: 5MB
+  directory-path: "C:\\data"
+
+stripe:
+  api.key: sk_test_51RUKbiPwbg9RbWOD1J9PtmSzPvYPTg3aalTyGssiF5ezpW0HxypsLE5p5ch1LrIujLyFR0hMhQfjIFYesoNv1zO300ZSYZS7Rr
+  public.key: pk_test_51RUKbiPwbg9RbWODHPo6PVMSPoJlcNZb3X1K582qcQ0LpLDJU8gkYaumyc53jhq8a3zmv3dOElxZL377pJxeKewl00O816Fmeb

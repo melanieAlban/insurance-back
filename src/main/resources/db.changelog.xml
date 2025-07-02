@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1" author="Rafael">
+        <createTable tableName="users">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(150)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rol" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="insurance">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(15)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(300)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coverage" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deductible" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_period" type="VARCHAR(15)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="Rafael">
+        <addUniqueConstraint tableName="insurance" columnNames="name"/>
+    </changeSet>
+
+    <changeSet id="3" author="Rafael">
+        <renameColumn tableName="insurance" oldColumnName="amount" newColumnName="payment_amount"/>
+    </changeSet>
+
+    <changeSet id="4" author="Rafael">
+        <renameColumn tableName="insurance" oldColumnName="is_active" newColumnName="active"/>
+        <renameColumn tableName="users" oldColumnName="is_active" newColumnName="active"/>
+    </changeSet>
+
+    <changeSet id="5" author="Freddy">
+        <createTable tableName="client">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identification_number" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birth_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(200)"/>
+            <column name="gender" type="VARCHAR(20)"/>
+            <column name="occupation" type="VARCHAR(100)"/>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_client_user"
+                             references="users(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="6" author="Freddy">
+        <createTable tableName="contract">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="insurance_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_contract_insurance"
+                             references="insurance(id)"/>
+            </column>
+            <column name="client_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_contract_client"
+                             references="client(id)"/>
+            </column>
+            <column name="start_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount_paid" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="7" author="Rafael">
+        <createTable tableName="signature">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="path_reference" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiration_date" type="DATE"/>
+            <column name="client_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="8" author="Freddy">
+        <addColumn tableName="client">
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="9" author="Freddy">
+        <modifyDataType tableName="client" columnName="phone_number" newDataType="VARCHAR(20)"/>
+    </changeSet>
+
+    <changeSet id="10" author="Rafael Soriano">
+        <addColumn tableName="contract">
+            <column name="beneficiary" type="VARCHAR">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="11" author="Freddy">
+        <createTable tableName="attachment">
+            <column name="id"
+                    type="UUID">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="pk_attachment"/>
+            </column>
+            <column name="path_reference"
+                    type="VARCHAR(255)"/>
+            <column name="contract_id"
+                    type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="contract_id"
+                                 baseTableName="attachment"
+                                 constraintName="FK_ATTACHMENT_ON_CONTRACT"
+                                 referencedColumnNames="id"
+                                 referencedTableName="contract"/>
+    </changeSet>
+
+    <changeSet id="12" author="Rafael Soriano">
+        <createTable tableName="beneficiary">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="identification_number" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contract_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <renameColumn oldColumnName="is_active" newColumnName="active" tableName="contract"/>
+        <dropColumn tableName="contract" columnName="beneficiary"/>
+
+        <addForeignKeyConstraint baseTableName="beneficiary" baseColumnNames="contract_id"
+                                 constraintName="fk_beneficiary_contract"
+                                 referencedTableName="contract"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="13" author="Rafael Soriano">
+        <dropTable tableName="signature"/>
+    </changeSet>
+
+    <changeSet id="14" author="Rafael Soriano">
+        <addColumn tableName="attachment">
+            <column name="attachment_type" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_name" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_id" type="UUID"/>
+        </addColumn>
+        <dropNotNullConstraint tableName="attachment" columnName="contract_id"/>
+
+        <createTable tableName="payment">
+            <column name="id"
+                    type="UUID">
+                <constraints nullable="false"
+                             primaryKey="true"/>
+            </column>
+            <column name="payment_type" type="VARCHAR(255)"/>
+            <column name="amount" type="DOUBLE"/>
+            <column name="date" type="DATE"/>
+            <column name="contract_id" type="UUID"/>
+            <column name="attachment_id" type="UUID"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="15" author="Rafael Soriano">
+        <createTable tableName="condition">
+            <column name="id"
+                    type="UUID">
+                <constraints nullable="false"
+                             primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="added_percentage" type="INT"/>
+        </createTable>
+
+        <createTable tableName="client_condition">
+            <column name="client_id" type="UUID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="condition_id" type="UUID">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="client_condition"
+                baseColumnNames="client_id"
+                constraintName="fk_client_condition_client"
+                referencedTableName="client"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="client_condition"
+                baseColumnNames="condition_id"
+                constraintName="fk_client_condition_condition"
+                referencedTableName="condition"
+                referencedColumnNames="id"/>
+
+        <sql>
+            CREATE
+            EXTENSION IF NOT EXISTS "uuid-ossp";
+        </sql>
+
+        <insert tableName="condition">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Discapacidad"/>
+            <column name="description" value="Persona con alguna discapacidad reconocida"/>
+            <column name="added_percentage" value="10"/>
+        </insert>
+        <insert tableName="condition">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Enfermedad crónica"/>
+            <column name="description" value="Condición médica persistente que afecta la cobertura o riesgo"/>
+            <column name="added_percentage" value="15"/>
+        </insert>
+        <insert tableName="condition">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Embarazo"/>
+            <column name="description" value="Cliente se encuentra en estado de gestación"/>
+            <column name="added_percentage" value="5"/>
+        </insert>
+        <insert tableName="condition">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Adulto mayor"/>
+            <column name="description" value="Cliente mayor de 65 años"/>
+            <column name="added_percentage" value="20"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="16" author="Rafael Soriano">
+        <addForeignKeyConstraint baseTableName="attachment" baseColumnNames="client_id"
+                                 constraintName="fk_attachment_client"
+                                 referencedTableName="client"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="17" author="Rafael Soriano">
+        <addColumn tableName="contract">
+            <column type="boolean" name="documents_approved">
+                <constraints nullable="false"/>
+            </column>
+            <column type="boolean" name="payment_proof_approved">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <createTable tableName="benefit">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)"/>
+            <column name="description" type="text"/>
+        </createTable>
+
+        <createTable tableName="insurance_benefit">
+            <column name="insurance_id" type="uuid"/>
+            <column name="benefit_id" type="uuid"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="insurance_benefit"
+                                 baseColumnNames="insurance_id"
+                                 constraintName="fk_insurance"
+                                 referencedTableName="insurance"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="insurance_benefit"
+                                 baseColumnNames="benefit_id"
+                                 constraintName="fk_benefit"
+                                 referencedTableName="benefit"
+                                 referencedColumnNames="id"/>
+
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Cobertura hospitalaria"/>
+            <column name="description" value="Incluye emergencias, hospitalización y UCI"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Medicina general"/>
+            <column name="description" value="Consultas médicas generales sin costo"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Exámenes de laboratorio"/>
+            <column name="description" value="Incluye exámenes de sangre, orina y más"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Imagenología"/>
+            <column name="description" value="Radiografías, ecografías y tomografías básicas"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Pediatría"/>
+            <column name="description" value="Consultas médicas para niños y adolescentes"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Ginecología"/>
+            <column name="description" value="Controles y procedimientos ginecológicos"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Odontología"/>
+            <column name="description" value="Consultas odontológicas y limpiezas básicas"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Salud mental"/>
+            <column name="description" value="Sesiones con psicólogos y psiquiatras"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Nutrición"/>
+            <column name="description" value="Consultas con nutricionistas y planes de dieta"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Fisioterapia"/>
+            <column name="description" value="Rehabilitación física postoperatoria o por lesiones"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Cobertura por maternidad"/>
+            <column name="description" value="Controles prenatales, parto y postparto"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Telemedicina"/>
+            <column name="description" value="Consultas virtuales con médicos generales y especialistas"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Urgencias 24/7"/>
+            <column name="description" value="Atención médica de emergencia las 24 horas"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Descuentos en farmacias"/>
+            <column name="description" value="Descuentos exclusivos en medicamentos recetados"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Chequeos preventivos"/>
+            <column name="description" value="Exámenes anuales de prevención y control general"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Oncología básica"/>
+            <column name="description" value="Evaluación y diagnóstico inicial de enfermedades oncológicas"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Cardiología básica"/>
+            <column name="description" value="Controles y evaluaciones cardiovasculares primarias"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Plan familiar"/>
+            <column name="description" value="Cobertura extendida para cónyuge e hijos"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Medicina alternativa"/>
+            <column name="description" value="Cobertura para acupuntura, homeopatía y terapias complementarias"/>
+        </insert>
+        <insert tableName="benefit">
+            <column name="id" valueComputed="uuid_generate_v4()"/>
+            <column name="name" value="Atención a domicilio"/>
+            <column name="description" value="Visitas médicas y de enfermería en casa"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="18" author="Rafael Soriano">
+        <renameColumn tableName="contract" oldColumnName="amount_paid" newColumnName="total_payment_amount"/>
+    </changeSet>
+
+    <changeSet id="19" author="Rafael Soriano">
+        <createTable tableName="contract_steps">
+            <column name="contract_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="step" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completed" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="contract_steps"
+                       columnNames="contract_id, step"
+                       constraintName="pk_contract_steps"/>
+
+        <addForeignKeyConstraint baseTableName="contract_steps"
+                                 baseColumnNames="contract_id"
+                                 referencedTableName="contract"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_contract_steps_contract"/>
+    </changeSet>
+
+    <changeSet id="20" author="Rafael Soriano">
+        <dropColumn tableName="contract" columnName="payment_proof_approved"/>
+        <dropColumn tableName="contract" columnName="documents_approved"/>
+
+        <dropForeignKeyConstraint baseTableName="attachment" constraintName="fk_attachment_on_contract"/>
+    </changeSet>
+
+    <changeSet id="21" author="Rafael Soriano">
+        <dropColumn tableName="attachment" columnName="contract_id"/>
+    </changeSet>
+
+    <changeSet id="22" author="Rafael Soriano">
+        <addColumn tableName="beneficiary">
+            <column name="relationship" type="VARCHAR"/>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="23" author="Rafael Soriano">
+        <addColumn tableName="payment">
+            <column name="reference_session_id" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="24" author="Rafael Soriano">
+        <createTable tableName="refund_request">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="refund_type" type="varchar(150)"/>
+            <column name="description" type="varchar(255)"/>
+            <column name="date" type="DATE"/>
+            <column name="observation" type="TEXT"/>
+            <column name="status" type="varchar(20)"/>
+            <column name="contract_id" type="UUID"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="refund_request" baseColumnNames="contract_id"
+                                 constraintName="fk_refund_contract"
+                                 referencedTableName="contract"
+                                 referencedColumnNames="id"/>
+
+        <addColumn tableName="attachment">
+            <column name="refund_request_id" type="UUID"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="25" author="Rafael Soriano">
+        <addColumn tableName="refund_request">
+            <column name="amount_paid" type="DECIMAL(10,2)"></column>
+            <column name="covered_amount" type="DECIMAL(10,2)"></column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
