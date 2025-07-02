@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: insurance-manager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - '5445:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - spring-network
+  insurance-app:
+    image: insurance-back:latest
+    container_name: insurance-app
+    depends_on:
+      - postgres-db
+    ports:
+      - '8888:8080'
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-db:5432/insurance-manager"
+      SPRING_DATASOURCE_USERNAME: "postgres"
+      SPRING_DATASOURCE_PASSWORD: "root"
+      MAILGUN_API_KEY: "52bb26272d5109598ec866314c675311-f3238714-b35e6523"
+      MAILGUN_DOMAIN: "sandbox4968b3d730234ad0851b18fdd744e0b6.mailgun.org"
+      STRIPE_API_KEY: "sk_test_51RUKbiPwbg9RbWOD1J9PtmSzPvYPTg3aalTyGssiF5ezpW0HxypsLE5p5ch1LrIujLyFR0hMhQfjIFYesoNv1zO300ZSYZS7Rr"
+      STRIPE_PUBLIC_KEY: "pk_test_51RUKbiPwbg9RbWODHPo6PVMSPoJlcNZb3X1K582qcQ0LpLDJU8gkYaumyc53jhq8a3zmv3dOElxZL377pJxeKewl00O816Fmeb"
+      ATTACHMENT_DIRECTORY_PATH: "/data"
+      ATTACHMENT_ALLOWED_TYPES: "PNG,JPG,JPEG,PDF"
+      ATTACHMENT_MAX_FILE_SIZE: "5MB"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "none"
+      SPRING_LIQUIBASE_ENABLED: "true"
+      SPRING_LIQUIBASE_DROP_FIRST: "false"
+      SPRING_LIQUIBASE_CHANGE_LOG: "classpath:db.changelog.xml"
+      SPRING_LIQUIBASE_DEFAULT_SCHEMA: "public"
+      SERVER_ERROR_INCLUDE_MESSAGE: "always"
+    volumes:
+      - data:/data
+    networks:
+      - spring-network
+volumes:
+  postgres-data:
+  data:
+networks:
+  spring-network:
